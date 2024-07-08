@@ -1,0 +1,81 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String?
+  description  String?
+  items        Item[]
+  status       Boolean?
+  privateField Boolean?
+}
+
+model Item {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  title        String?
+  description  String?
+  releaseDate  DateTime?
+  category     Category?  @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  progresses   Progress[]
+  status       Boolean?
+  privateField Boolean?
+}
+
+model Wishlist {
+  id           String              @id @default(cuid())
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  items        EnumWishlistItems[]
+  user         User?               @relation(fields: [userId], references: [id])
+  userId       String?
+  status       Boolean?
+  privateField Boolean?
+}
+
+model Progress {
+  id           String              @id @default(cuid())
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  status       EnumProgressStatus?
+  lastUpdated  DateTime?
+  user         User?               @relation(fields: [userId], references: [id])
+  userId       String?
+  item         Item?               @relation(fields: [itemId], references: [id])
+  itemId       String?
+  privateField Boolean?
+}
+
+model User {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  firstName    String?
+  lastName     String?
+  username     String     @unique
+  email        String?    @unique
+  password     String
+  roles        Json
+  progresses   Progress[]
+  wishlists    Wishlist[]
+  status       Boolean?
+  privateField Boolean?
+}
+
+enum EnumWishlistItems {
+  Option1
+}
+
+enum EnumProgressStatus {
+  Option1
+}
